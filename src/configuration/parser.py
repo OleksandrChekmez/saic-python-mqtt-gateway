@@ -133,6 +133,8 @@ def __setup_saic_api(args: Namespace, config: Configuration) -> None:
         config.saic_read_timeout = args.saic_read_timeout
     if args.saic_user_timezone is not None:
         config.saic_user_timezone = args.saic_user_timezone
+    if args.saic_ignore_status_time_drift is not None:
+        config.saic_ignore_status_time_drift = args.saic_ignore_status_time_drift
 
 
 def __setup_home_assistant(args: Namespace, config: Configuration) -> None:
@@ -378,6 +380,18 @@ def __add_saic_api_argument_group(
         action=EnvDefault,
         envvar="SAIC_USER_TIMEZONE",
         type=check_timezone,
+    )
+    saic_api.add_argument(
+        "--saic-ignore-status-time-drift",
+        help="""Accept vehicle status updates even if their timestamp is more than
+                15 minutes away from the current time. Useful when the car clock is
+                wrong (e.g. GPS spoofing). Stale updates are no longer detected.""",
+        dest="saic_ignore_status_time_drift",
+        required=False,
+        action=EnvDefault,
+        envvar="SAIC_IGNORE_STATUS_TIME_DRIFT",
+        default=False,
+        type=check_bool,
     )
     saic_api.add_argument(
         "--messages-request-interval",

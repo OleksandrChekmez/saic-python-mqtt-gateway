@@ -33,6 +33,7 @@ class Configuration:
         self.saic_relogin_delay: int = 15 * 60  # in seconds
         self.saic_read_timeout: float = 10.0  # in seconds
         self.saic_user_timezone: ZoneInfo | None = None
+        self.saic_ignore_status_time_drift: bool = False
         self.battery_capacity_map: dict[str, float] = {}
         self.mqtt_host: str | None = None
         self.mqtt_port: int = 1883

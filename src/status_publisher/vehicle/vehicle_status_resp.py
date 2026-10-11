@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import datetime
+import logging
 from typing import TYPE_CHECKING, Final, override
 
 from saic_ismart_client_ng.api.vehicle import VehicleStatusResp
@@ -25,6 +26,7 @@ if TYPE_CHECKING:
     from publisher.core import Publisher
     from vehicle_info import VehicleInfo
 
+LOG = logging.getLogger(__name__)
 
 _INVALID_TIMESTAMPS: Final = frozenset({0, 2147483647})
 
@@ -44,9 +46,14 @@ class VehicleStatusRespPublisher(
     VehicleDataPublisher[VehicleStatusResp, VehicleStatusRespProcessingResult]
 ):
     def __init__(
-        self, vin: VehicleInfo, publisher: Publisher, mqtt_vehicle_prefix: str
+        self,
+        vin: VehicleInfo,
+        publisher: Publisher,
+        mqtt_vehicle_prefix: str,
+        ignore_status_time_drift: bool = False,
     ) -> None:
         super().__init__(vin, publisher, mqtt_vehicle_prefix)
+        self.__ignore_status_time_drift: Final[bool] = ignore_status_time_drift
         self.__gps_position_publisher: Final[GpsPositionPublisher] = (
             GpsPositionPublisher(vin, publisher, mqtt_vehicle_prefix)
         )
@@ -71,7 +78,9 @@ class VehicleStatusRespPublisher(
 
         if vehicle_status_drift > datetime.timedelta(minutes=15):
             msg = f"Vehicle status time drifted more than 15 minutes from current time: {vehicle_status_drift}. Server reported {vehicle_status_time}"
-            raise VehicleStatusDriftException(msg)
+            if not self.__ignore_status_time_drift:
+                raise VehicleStatusDriftException(msg)
+            LOG.debug("Ignoring drift as configured. %s", msg)
 
         basic_vehicle_status = vehicle_status.basicVehicleStatus
         if basic_vehicle_status:

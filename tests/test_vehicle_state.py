@@ -313,6 +313,35 @@ class TestVehicleState(unittest.IsolatedAsyncioTestCase):
         ):
             self.vehicle_state.handle_vehicle_status(resp)
 
+    def test_handle_vehicle_status_accepts_drifted_timestamp_when_ignored(
+        self,
+    ) -> None:
+        vehicle_state = self.__vehicle_state_ignoring_drift()
+        resp = get_mock_vehicle_status_resp()
+        resp.statusTime = 1837900800  # 2028-03-28, far in the future
+        vehicle_state.handle_vehicle_status(resp)
+        assert (
+            self.get_topic(mqtt_topics.REFRESH_LAST_VEHICLE_STATE) in self.publisher.map
+        )
+
+    def test_handle_vehicle_status_rejects_zero_timestamp_when_drift_ignored(
+        self,
+    ) -> None:
+        vehicle_state = self.__vehicle_state_ignoring_drift()
+        resp = get_mock_vehicle_status_resp()
+        resp.statusTime = 0
+        with pytest.raises(VehicleStatusDriftException, match="invalid timestamp"):
+            vehicle_state.handle_vehicle_status(resp)
+
+    def __vehicle_state_ignoring_drift(self) -> VehicleState:
+        return VehicleState(
+            self.publisher,
+            BlockingScheduler(),
+            f"/vehicles/{VIN}",
+            self.vehicle_state.vehicle,
+            ignore_status_time_drift=True,
+        )
+
     def test_mileage_of_day_published_when_valid(self) -> None:
         """Mileage of day is published when it does not exceed total mileage."""
         vehicle_status_resp = get_mock_vehicle_status_resp()

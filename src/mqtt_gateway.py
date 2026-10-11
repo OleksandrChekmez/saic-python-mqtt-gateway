@@ -265,6 +265,7 @@ class MqttGateway(MqttCommandListener, VehicleHandlerLocator):
             info,
             charge_polling_min_percent=self.configuration.charge_dynamic_polling_min_percentage,
             user_timezone=self.__user_timezone,
+            ignore_status_time_drift=self.configuration.saic_ignore_status_time_drift,
         )
         return VehicleHandler(
             self.configuration,

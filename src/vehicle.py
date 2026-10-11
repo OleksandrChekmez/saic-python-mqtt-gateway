@@ -94,11 +94,15 @@ class VehicleState:
         vin_info: VehicleInfo,
         charge_polling_min_percent: float = 1.0,
         user_timezone: ZoneInfo | None = None,
+        ignore_status_time_drift: bool = False,
     ) -> None:
         self.publisher = publisher
         self.__message_publisher = MessagePublisher(vin_info, publisher, account_prefix)
         self.__vehicle_response_publisher = VehicleStatusRespPublisher(
-            vin_info, publisher, account_prefix
+            vin_info,
+            publisher,
+            account_prefix,
+            ignore_status_time_drift=ignore_status_time_drift,
         )
         self.__charge_response_publisher = ChrgMgmtDataRespPublisher(
             vin_info, publisher, account_prefix

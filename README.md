@@ -42,6 +42,7 @@ When using combinations of configuration methods, the order of precedence is as 
 | --charge-min-percentage     | CHARGE_MIN_PERCENTAGE        | How many % points we should try to refresh the charge state. 1.0 by default                                                                                                         |
 | --account-refresh-interval  | ACCOUNT_REFRESH_INTERVAL     | Interval in seconds for refreshing account-level data (vehicle list, timezone). Default is 86400 (24 hours).                                                                        |
 | --saic-user-timezone        | SAIC_USER_TIMEZONE           | Force the account timezone instead of trusting the SAIC API value. Accepts an IANA name (e.g. `Australia/Sydney`) or `GMT+HH:MM`. Mismatches with the API offset are logged.        |
+| --saic-ignore-status-time-drift | SAIC_IGNORE_STATUS_TIME_DRIFT | Accept vehicle status updates whose timestamp is more than 15 minutes away from the current time (e.g. wrong car clock due to GPS spoofing). Stale updates are no longer detected. Disabled (False) by default. |
 | --publish-raw-api-data      | PUBLISH_RAW_API_DATA_ENABLED | Publish raw SAIC API request/response to MQTT. Disabled (False) by default.                                                                                                         |
 
 #### API Endpoints
