@@ -1,0 +1,21 @@
+---
+name: 'build custom images'
+
+# Fork-only workflow: builds images for the `custom` branch.
+# Tag format: <upstream version>-oc<N>, e.g. 0.13.0-oc1
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+-oc[0-9]+"
+
+permissions: write-all
+
+jobs:
+  build-images:
+    uses: ./.github/workflows/build_docker_images.yml
+    with:
+      image-tag: custom
+      version-tag: ${{ github.ref_name }}
+      use-cache: true
+    secrets: inherit
