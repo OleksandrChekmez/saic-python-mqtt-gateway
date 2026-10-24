@@ -9,6 +9,12 @@ from configuration.argparse_extensions import check_timezone
 from configuration.parser import process_command_line, setup_parser
 
 
+@pytest.fixture(autouse=True)
+def isolated_environ(monkeypatch: pytest.MonkeyPatch) -> None:
+    # Ignore the local .env file and environment so defaults are predictable.
+    monkeypatch.setattr("configuration.argparse_extensions.merged_environ", {})
+
+
 def test_setup_parser_should_generate_a_valid_parser() -> None:
     parser = setup_parser()
     parser.print_help()
